@@ -4,6 +4,8 @@ const validator = require("validator");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { TrackerSchema } = require("./tracker_schema");
+const ObjectId = mongoose.Types.ObjectId;
+
 
 const UserSchema = new mongoose.Schema({
     email: {

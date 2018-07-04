@@ -1,0 +1,7 @@
+Need to fix adding multiple users, related to ObjectId.
+
+Not sure what's going on, here's my current error message:
+
+    "message": "E11000 duplicate key error collection: CourtAPIDev.users index: trackers.case_id_1 dup key: { : null }"
+
+It must have something to do with having a null field in my trackers model, because it autopopulates it when the user is created.
