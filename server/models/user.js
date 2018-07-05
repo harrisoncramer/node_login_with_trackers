@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { CourtCaseSchema } = require("./court_case_schema");
 const { TwitterSchema } = require("./twitter_schema");
+const { LegislationSchema } = require("./legislation_schema");
 const { EmailSchema } = require("./email_schema");
 
 const ObjectId = mongoose.Types.ObjectId;
@@ -41,9 +42,7 @@ const UserSchema = new mongoose.Schema({
     }],
     trackers: {
         tweets: [TwitterSchema],
-        legislation: {
-            type: Array
-        },
+        legislation: [LegislationSchema],
         court_cases: [CourtCaseSchema]
     },
     frequency: [EmailSchema]
@@ -86,7 +85,26 @@ UserSchema.methods.tweetValidator = function(new_handle){
         user.trackers.tweets.push(new_handle);
         return user.save();
     } else {
-        return Promise.reject(`Sorry, ${new_handle} could not be tracked.`);
+        return Promise.reject(`Sorry, ${new_handle.account} could not be tracked.`);
+    }
+};
+
+
+UserSchema.methods.legislationValidator = function(legislation){
+    var user = this;
+    var result = false;
+
+    if(typeof legislation === 'object'){
+
+        // VALIDATION HERE
+        result = true;
+    }
+
+    if(result){
+        user.trackers.legislation.push(legislation);
+        return user.save();
+    } else {
+        return Promise.reject(`Sorry, ${legislation.legislation} could not be found.`);
     }
 };
 
@@ -104,25 +122,7 @@ UserSchema.methods.courtCaseValidator = function(new_case){
         user.trackers.court_cases.push(new_case);
         return user.save();
     } else {
-        return Promise.reject(`Sorry, ${new_case} could not be tracked.`);
-    }
-};
-
-UserSchema.methods.legislationValidator = function(legislation){
-    var user = this;
-    var result = false;
-
-    if(typeof legislation === 'object'){
-
-        // VALIDATION HERE
-        result = true;
-    }
-
-    if(result){
-        user.trackers.legislation.push(legislation);
-        return user.save();
-    } else {
-        return Promise.reject(`Sorry, ${legislation} could not be tracked.`);
+        return Promise.reject(`Sorry, ${new_case.case_name} could not be found.`);
     }
 };
 
