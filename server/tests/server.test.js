@@ -10,6 +10,22 @@ const { users, populateUsers } = require("./seed/seed");
 // Reset database for tests
 beforeEach(populateUsers);
 
+describe("GET /", () => {
+    it("Should return logged in page if user is authenticated", (done) => {
+        supertest(app)
+            .get("/")
+            .set("x-auth", users[0].tokens[0].token)
+            .expect(200)
+            .end(done);
+    });
+    it("Should redirect to login page", (done) => {
+        supertest(app)
+            .get("/")
+            .expect(401)
+            .end(done);
+    });
+});
+
 describe("POST /users", () => {
     it("Should post a new user", (done) => {
         var email = "uniqueemail@example.com"
@@ -111,94 +127,6 @@ describe("POST /users/login", () => { // This will return a token to the user.
             });
     });
 });
-
-/// TRACKER TESTS
-
-
-describe("POST /users/me/trackers/tweets", () => {
-    it("Should post a new twitter handle", (done) => {
-        const account = "harrisoncramer";
-        supertest(app)
-            .post("/users/me/trackers/tweets")
-            .set("x-auth", users[0].tokens[0].token) // Pass in token.
-            .send({account: account})
-            .expect(200)
-            .expect((res) => {
-               expect(res.body[0].account === account);
-            })
-            .end((err,res) => {
-                if(err){
-                    done(err);
-                }
-                User.findById(users[0]._id).then((user) => {
-                    expect(user.trackers.tweets.length === 1)
-                    expect(user.trackers.tweets === account)
-                        done();
-                })
-            })
-    });
-    it("Should not post an invalid twitter handle", (done) => {
-        const account = {};
-        supertest(app)
-            .post("/users/me/trackers/tweets")
-            .set("x-auth", users[0].tokens[0].token) // Pass in token.
-            .send({account: account})
-            .expect(400)
-            .end((err,res) => {
-                if(err){
-                    done(err);
-                }
-                User.findById(users[0]._id).then((user) => {
-                    expect(user.trackers.tweets.length === 0)
-                    done();
-                })
-            })
-    });
-});
-
-
-describe("POST /users/me/trackers/legislation", () => {
-    it("Should post a new legislation", (done) => {
-        const legislation = "hr1260";
-        supertest(app)
-            .post("/users/me/trackers/legislation")
-            .set("x-auth", users[0].tokens[0].token) // Pass in token.
-            .send({legislation: legislation})
-            .expect(200)
-            .expect((res) => {
-               expect(res.body[0].legislation === legislation);
-            })
-            .end((err,res) => {
-                if(err){
-                    done(err);
-                }
-                User.findById(users[0]._id).then((user) => {
-                    expect(user.trackers.legislation.length === 1)
-                    expect(user.trackers.legislation === legislation)
-                        done();
-                })
-            })
-    });
-    it("Should not post invalid legislation", (done) => {
-        const legislation = {};
-        supertest(app)
-            .post("/users/me/trackers/legislation")
-            .set("x-auth", users[0].tokens[0].token) // Pass in token.
-            .send({legislation: legislation})
-            .expect(400)
-            .end((err,res) => {
-                if(err){
-                    done(err);
-                }
-                User.findById(users[0]._id).then((user) => {
-                    expect(user.trackers.legislation.length === 0)
-                    done();
-                });
-            })
-    });
-});
-
-/// LOGOUT
 
 describe("DELETE /users/me/token", () => {
     it("Should logout a user by deleting the jwt token", (done) => {

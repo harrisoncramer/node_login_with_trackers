@@ -53,21 +53,8 @@ UserSchema.methods.toJSON = function() {
     var userObject = user.toObject(); // Converts mongoose model to object, it's a method of model
 
     userObject;
-    return _.pick(userObject, ['_id', 'email']); // Return object w/ just _id and email
+    return _.pick(userObject, ['_id', 'email', 'frequency']); // Return object w/ just _id and email
 };
-
-/*UserSchema.methods.tweetValidator = function(new_handle) {
-       var user = this;
-       var re = /^@?(\w){1,15}$/;
-       result = re.test(new_handle);
-
-        if(result){
-            user.trackers.tweets.push(new_handle);
-            return user.save();
-        } else {
-            return Promise.reject(`Sorry, ${new_handle} could not be tracked.`)
-       }
-};*/
 
 
 UserSchema.methods.tweetValidator = function(new_handle){
@@ -82,6 +69,7 @@ UserSchema.methods.tweetValidator = function(new_handle){
     }
 
     if(result){
+
         user.trackers.tweets.push(new_handle);
         return user.save();
     } else {
