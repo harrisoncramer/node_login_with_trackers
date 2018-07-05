@@ -13,8 +13,12 @@ const app = express();
 app.use(bodyParser.json());
 
 app.get("/", authenticate, (req,res) => {
-
-})
+    User.findOne({_id: req.user._id}).then((user) => {
+        res.status(200).sendFile("index.html", {root: path.join(__dirname + '../../public')});
+    }).catch((e) => {
+        res.status(400).send();
+    })
+});
 
 // ROUTES
 
@@ -22,10 +26,13 @@ app.post("/users", (req,res) => {
     var body = _.pick(req.body, ['email', 'password']);
     var user = new User(body);
 
+    /// WHAT DO I DO HERE
+
     user.save().then(() => {
         return user.generateAuthToken();
     }).then((token) => {
         res.header("x-auth", token).send(user);
+        res.send(user)
     }).catch((e) => {
         res.status(400).send(e);
     });
@@ -44,11 +51,16 @@ app.post("/users/login", (req,res) => {
     })
 });
 
-app.get("/users/me", authenticate, (req,res) => {
-    res.send(req.user);
+app.get("/users/me/", authenticate, (req,res) => {
+    User.findOne({_id: req.user._id}).then((user) => {
+        res.status(200).send(user)
+    })
+    .catch((e) => {
+        res.status(400).send();
+    })
 });
 
-app.delete("/users/logout", authenticate, (req, res) => {
+app.delete("/users/me", authenticate, (req, res) => {
   req.user.removeToken(req.token).then(
     () => {
       res.status(200).sendFile("login.html", {root: path.join(__dirname + '../../public')});
@@ -62,28 +74,13 @@ app.delete("/users/logout", authenticate, (req, res) => {
 ///// TRACKER ROUTES
 
 app.get("/users/me/trackers", authenticate, (req,res) => {
-   res.send(req.user.trackers);
+    User.findOne({_id: req.user._id}).then((user) => {
+        res.status(200).send(user.trackers)
+    })
+    .catch((e) => {
+        res.status(400).send();
+    })
 });
-
-
-
-        /*
-        app.delete("/users/me/trackers", authenticate, (req,res) => {
-            if (confirm("Are you sure you want to delete all trackers?")) {
-                User.findOne({_id: req.user._id})
-                    .then((user) => {
-                        user.trackers.remove({});
-                    })
-            } else {
-                res.status(200).send();
-                console.log("None deleted.")
-            }
-            res.send(req.user);
-        });
-*/
-
-
-
 
 app.post("/users/me/trackers/court_cases", authenticate, (req,res) => {
     let new_case = {
@@ -94,54 +91,65 @@ app.post("/users/me/trackers/court_cases", authenticate, (req,res) => {
 
     User.findOne({_id: req.user._id})
         .then((user) => {
-            // Add the tracker to the trackers array.
-            user.trackers.court_cases.push(new_case)
-            return user.save();
+            return user.courtCaseValidator(new_case)
         })
-        .then(() => User.findOne({_id: req.user._id}))
         .then((user) => {
-            res.send(user.trackers.court_cases)
+            res.status(200).send(user.trackers.court_cases);
         }).catch((e) => {
-            res.status(400).send();
+            res.status(400).send(e);
         });
 });
 
 app.post("/users/me/trackers/tweets", authenticate, (req,res) => {
-    let new_account = req.body.account;
+    let new_handle = {
+        account: req.body.account
+    };
 
     User.findOne({_id: req.user._id})
         .then((user) => {
-            // Add the tracker to the trackers array.
-            user.trackers.tweets.push(new_account)
-            return user.save();
+            return user.tweetValidator(new_handle)
         })
-        .then(() => User.findOne({_id: req.user._id}))
         .then((user) => {
-            res.send(user.trackers.tweets)
+            res.status(200).send(user.trackers.tweets);
         }).catch((e) => {
-            res.status(400).send();
+            res.status(400).send(e);
         });
 });
 
 
 app.post("/users/me/trackers/legislation", authenticate, (req,res) => {
-    let new_legislation = req.body.legislation;
+    let new_legislation = {
+        legislation: req.body.legislation
+    }
 
     User.findOne({_id: req.user._id})
         .then((user) => {
             // Add the tracker to the trackers array.
-            user.trackers.legislation.push(new_legislation)
-            return user.save();
+            return user.legislationValidator(new_legislation)
         })
-        .then(() => User.findOne({_id: req.user._id}))
         .then((user) => {
-            res.send(user.trackers.legislation)
+            res.status(200).send(user.trackers.legislation)
         }).catch((e) => {
-            res.status(400).send();
+            res.status(400).send(e);
         });
 });
 
 
+app.delete("/users/me/trackers", authenticate, (req,res) => {
+    User.findOne({_id: req.user._id})
+        .then((user) => {
+                user.trackers.legislation = [];
+                user.trackers.tweets = [];
+                user.trackers.court_cases = [];
+            return user.save();
+        })
+        .then(() => User.findOne({_id: req.user._id}))
+        .then((user) => {
+            res.status(200).send(user.trackers)
+        }).catch((e) => {
+            res.status(400).send();
+        });
+});
 
 
 const port = process.env.PORT;

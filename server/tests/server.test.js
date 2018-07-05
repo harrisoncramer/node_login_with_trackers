@@ -112,10 +112,10 @@ describe("POST /users/login", () => { // This will return a token to the user.
     });
 });
 
-describe("DELETE /users/logout", () => {
+describe("DELETE /users/me/token", () => {
     it("Should logout a user by deleting the jwt token", (done) => {
         supertest(app)
-            .delete("/users/logout")
+            .delete("/users/me/")
             .set("x-auth", users[0].tokens[0].token)
             .expect(200)
             .end((err,res) => {

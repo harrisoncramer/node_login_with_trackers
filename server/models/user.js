@@ -3,7 +3,10 @@ const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const { TrackerSchema } = require("./tracker_schema");
+const { CourtCaseSchema } = require("./court_case_schema");
+const { TwitterSchema } = require("./twitter_schema");
+const { EmailSchema } = require("./email_schema");
+
 const ObjectId = mongoose.Types.ObjectId;
 
 
@@ -37,27 +40,91 @@ const UserSchema = new mongoose.Schema({
         }
     }],
     trackers: {
-        tweets: {
-            type: Array
-        },
+        tweets: [TwitterSchema],
         legislation: {
             type: Array
         },
-        court_cases: [TrackerSchema]
-    }
+        court_cases: [CourtCaseSchema]
+    },
+    frequency: [EmailSchema]
 });
 
 UserSchema.methods.toJSON = function() {
     var user = this; // The model
     var userObject = user.toObject(); // Converts mongoose model to object, it's a method of model
 
+    userObject;
     return _.pick(userObject, ['_id', 'email']); // Return object w/ just _id and email
 };
 
-UserSchema.methods.addTweet = function(handle) {
-    var re = /^@?(\w){1,15}$/;
-    return re.test(handle)
-}
+/*UserSchema.methods.tweetValidator = function(new_handle) {
+       var user = this;
+       var re = /^@?(\w){1,15}$/;
+       result = re.test(new_handle);
+
+        if(result){
+            user.trackers.tweets.push(new_handle);
+            return user.save();
+        } else {
+            return Promise.reject(`Sorry, ${new_handle} could not be tracked.`)
+       }
+};*/
+
+
+UserSchema.methods.tweetValidator = function(new_handle){
+    var user = this;
+    var result = false;
+
+    if(typeof new_handle === 'object'){
+
+        // VALIDATION HERE
+         var re = /^@?(\w){1,15}$/;
+         result = re.test(new_handle.account);
+    }
+
+    if(result){
+        user.trackers.tweets.push(new_handle);
+        return user.save();
+    } else {
+        return Promise.reject(`Sorry, ${new_handle} could not be tracked.`);
+    }
+};
+
+UserSchema.methods.courtCaseValidator = function(new_case){
+    var user = this;
+    var result = false;
+
+    if(typeof new_case === 'object'){
+
+        /// VALIDATION HERE
+        result = true;
+    }
+
+    if(result){
+        user.trackers.court_cases.push(new_case);
+        return user.save();
+    } else {
+        return Promise.reject(`Sorry, ${new_case} could not be tracked.`);
+    }
+};
+
+UserSchema.methods.legislationValidator = function(legislation){
+    var user = this;
+    var result = false;
+
+    if(typeof legislation === 'object'){
+
+        // VALIDATION HERE
+        result = true;
+    }
+
+    if(result){
+        user.trackers.legislation.push(legislation);
+        return user.save();
+    } else {
+        return Promise.reject(`Sorry, ${legislation} could not be tracked.`);
+    }
+};
 
 
 // Returns a promise that resolves with the signed user token.
@@ -115,7 +182,6 @@ UserSchema.statics.findByCredentials = function(email,password){
         return Promise.reject(e);
     })
 }
-
 
 UserSchema.pre('save', function(next) {
     var user = this;
