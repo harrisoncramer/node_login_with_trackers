@@ -7,6 +7,7 @@ const { CourtCaseSchema } = require("./court_case_schema");
 const { TwitterSchema } = require("./twitter_schema");
 const { LegislationSchema } = require("./legislation_schema");
 const { EmailSchema } = require("./email_schema");
+const axios = require("axios");
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -54,27 +55,6 @@ UserSchema.methods.toJSON = function() {
 
     userObject;
     return _.pick(userObject, ['_id', 'email', 'frequency']); // Return object w/ just _id and email
-};
-
-
-UserSchema.methods.tweetValidator = function(new_handle){
-    var user = this;
-    var result = false;
-
-    if(typeof new_handle === 'object'){
-
-        // VALIDATION HERE
-         var re = /^@?(\w){1,15}$/;
-         result = re.test(new_handle.account);
-    }
-
-    if(result){
-
-        user.trackers.tweets.push(new_handle);
-        return user.save();
-    } else {
-        return Promise.reject(`Sorry, ${new_handle.account} could not be tracked.`);
-    }
 };
 
 

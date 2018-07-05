@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const { mongoose } = require("./db/mongoose");
 const { User } = require("./models/user");
 const { authenticate } = require("./middleware/authenticate");
+const { tweetValidator } = require("./middleware/tweetValidator");
 
 const app = express();
 
@@ -103,18 +104,17 @@ app.use(bodyParser.json());
             });
     });
 
-    app.post("/users/me/trackers/tweets", authenticate, (req,res) => {
-        let new_handle = {
-            account: req.body.account
-        };
-
+    app.post("/users/me/trackers/tweets", authenticate, tweetValidator, (req,res) => {
         User.findOne({_id: req.user._id})
             .then((user) => {
-                return user.tweetValidator(new_handle)
+                user.trackers.tweets.push(req.body);
+                return user.save();
             })
             .then((user) => {
-                res.status(200).send(user.trackers.tweets);
-            }).catch((e) => {
+                res.status(200)
+                    .send(user.trackers.tweets)
+            })
+            .catch((e) => {
                 res.status(400).send(e);
             });
     });
