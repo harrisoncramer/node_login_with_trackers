@@ -17,7 +17,7 @@ app.use(bodyParser.json());
             res.status(200).sendFile("index.html", {root: path.join(__dirname + '../../public')});
         })
         .catch((e) => {
-            res.status(400).sendFile("index.html", {root: path.join(__dirname + '../../public')});
+            res.status(400).send(e);
         })
     });
 
@@ -31,13 +31,11 @@ app.use(bodyParser.json());
         }
         var user = new User(body);
 
-        /// WHAT DO I DO HERE
-
         user.save().then(() => {
             return user.generateAuthToken();
         }).then((token) => {
-            res.header("x-auth", token).send(user);
-            res.send(user)
+            res.header("x-auth", token);
+            res.send(user);
         }).catch((e) => {
             res.status(400).send(e);
         });

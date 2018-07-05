@@ -16,12 +16,18 @@ describe("GET /", () => {
             .get("/")
             .set("x-auth", users[0].tokens[0].token)
             .expect(200)
+            .expect((res) => {
+                expect(res.text === "<p>CUSTOM USER HERE</p>");
+            })
             .end(done);
     });
     it("Should redirect to login page", (done) => {
         supertest(app)
             .get("/")
             .expect(401)
+            .expect((res) => {
+                expect(res.text === "<p>THIS IS THE LOGIN PAGE<p>");
+            })
             .end(done);
     });
 });

@@ -17,7 +17,8 @@ const authenticate = (req, res, next) => { // The actual route will not run unti
             })
         .catch((e) => {
             // Home Login Page
-            res.status(401).sendFile("login.html", {root: path.join(__dirname + '../../../public')});
+            res.status(401)
+                .sendFile("login.html", {root: path.join(__dirname + '../../../public')});
         });
 };
 
