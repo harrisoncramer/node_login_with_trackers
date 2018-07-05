@@ -6,6 +6,7 @@ Run NPM install to install relevant modules. Requires a config.json file to run,
 Could look something like this:
 
 {
+
     "test" : {
         "PORT" : 3000,
         "MONGODB_URI" : "mongodb://localhost:27017/YourTestDatabase",
