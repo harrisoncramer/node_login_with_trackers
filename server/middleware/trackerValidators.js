@@ -21,6 +21,16 @@ tweetValidator = function(req, res, next){
         });
 };
 
+legislationValidator = function(req, res, next){
+   next();
+};
+
+caseValidator = function(req, res, next){
+   next();
+};
+
 module.exports = {
-    tweetValidator
+    tweetValidator,
+    legislationValidator,
+    caseValidator
 }

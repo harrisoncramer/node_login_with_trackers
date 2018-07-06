@@ -3,14 +3,10 @@ const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const { CourtCaseSchema } = require("./court_case_schema");
-const { TwitterSchema } = require("./twitter_schema");
-const { LegislationSchema } = require("./legislation_schema");
-const { EmailSchema } = require("./email_schema");
+const { CourtCaseSchema, TwitterSchema, LegislationSchema, EmailSchema } = require("./trackerSchemas");
 const axios = require("axios");
 
 const ObjectId = mongoose.Types.ObjectId;
-
 
 const UserSchema = new mongoose.Schema({
     email: {
@@ -55,43 +51,6 @@ UserSchema.methods.toJSON = function() {
 
     userObject;
     return _.pick(userObject, ['_id', 'email', 'frequency']); // Return object w/ just _id and email
-};
-
-
-UserSchema.methods.legislationValidator = function(legislation){
-    var user = this;
-    var result = false;
-
-    if(typeof legislation === 'object'){
-
-        // VALIDATION HERE
-        result = true;
-    }
-
-    if(result){
-        user.trackers.legislation.push(legislation);
-        return user.save();
-    } else {
-        return Promise.reject(`Sorry, ${legislation.legislation} could not be found.`);
-    }
-};
-
-UserSchema.methods.courtCaseValidator = function(new_case){
-    var user = this;
-    var result = false;
-
-    if(typeof new_case === 'object'){
-
-        /// VALIDATION HERE
-        result = true;
-    }
-
-    if(result){
-        user.trackers.court_cases.push(new_case);
-        return user.save();
-    } else {
-        return Promise.reject(`Sorry, ${new_case.case_name} could not be found.`);
-    }
 };
 
 

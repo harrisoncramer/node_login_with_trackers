@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const { mongoose } = require("./db/mongoose");
 const { User } = require("./models/user");
 const { authenticate } = require("./middleware/authenticate");
-const { tweetValidator } = require("./middleware/tweetValidator");
+const { tweetValidator, legislationValidator, caseValidator } = require("./middleware/trackerValidators");
 
 const app = express();
 
@@ -86,7 +86,7 @@ app.use(bodyParser.json());
         })
     });
 
-    app.post("/users/me/trackers/court_cases", authenticate, (req,res) => {
+    app.post("/users/me/trackers/court_cases", authenticate, caseValidator, (req,res) => {
         let new_case = {
             case_id: req.body.case_id, // E.g. hr1488
             case_name: req.body.case_name, // Name of bill
@@ -95,7 +95,8 @@ app.use(bodyParser.json());
 
         User.findOne({_id: req.user._id})
             .then((user) => {
-                return user.courtCaseValidator(new_case)
+                user.trackers.court_cases.push(req.body);
+                return user.save();
             })
             .then((user) => {
                 res.status(200).send(user.trackers.court_cases);
@@ -115,23 +116,22 @@ app.use(bodyParser.json());
                     .send(user.trackers.tweets)
             })
             .catch((e) => {
-                res.send(e);
+                res.status(400).send(e);
             });
     });
 
 
-    app.post("/users/me/trackers/legislation", authenticate, (req,res) => {
+    app.post("/users/me/trackers/legislation", authenticate, legislationValidator, (req,res) => {
         let new_legislation = {
             legislation: req.body.legislation
         }
-
         User.findOne({_id: req.user._id})
             .then((user) => {
-                // Add the tracker to the trackers array.
-                return user.legislationValidator(new_legislation)
+                user.trackers.legislation.push(req.body);
+                return user.save();
             })
             .then((user) => {
-                res.status(200).send(user.trackers.legislation)
+                res.status(200).send(user.trackers.legislation);
             }).catch((e) => {
                 res.status(400).send(e);
             });
