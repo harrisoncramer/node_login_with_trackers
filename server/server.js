@@ -115,7 +115,7 @@ app.use(bodyParser.json());
                     .send(user.trackers.tweets)
             })
             .catch((e) => {
-                res.status(400).send(e);
+                res.send(e);
             });
     });
 

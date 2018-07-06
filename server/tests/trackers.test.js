@@ -22,21 +22,12 @@ describe("POST /users/me/trackers/tweets", () => {
             .expect((res) => {
                expect(res.body[0].account === account);
             })
-            .end((err,res) => {
-                if(err){
-                    done(err);
-                }
-                User.findById(users[0]._id).then((user) => {
-                    expect(user.trackers.tweets.length === 1)
-                    expect(user.trackers.tweets === account)
-                        done();
-                })
-            })
+            .end(done)
     });
 
 
     it("Should not post an invalid twitter handle", (done) => {
-        const account = {};
+        const account = "sdsiopdfanusdfoiosd";
         supertest(app)
             .post("/users/me/trackers/tweets")
             .set("x-auth", users[0].tokens[0].token) // Pass in token.

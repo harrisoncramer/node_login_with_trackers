@@ -9,7 +9,6 @@ const authenticate = (req, res, next) => { // The actual route will not run unti
             if(!user) {
                 return Promise.reject(); // Will cause catch block to fire.
             }
-            //// WE SET OUR USER AND TOKEN ON THE REQUEST IF SUCCESSFUL HERE /////
             req.user = user;
             req.token = token;
             next();
