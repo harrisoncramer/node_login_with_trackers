@@ -10,7 +10,6 @@ const { users, populateUsers } = require("./seed/seed");
 // Reset database for tests
 beforeEach(populateUsers);
 
-
 describe("POST /users/me/trackers/tweets", () => {
     it("Should post a new twitter handle", (done) => {
         const account = "harrisoncramer";
@@ -24,7 +23,6 @@ describe("POST /users/me/trackers/tweets", () => {
             })
             .end(done)
     });
-
 
     it("Should not post an invalid twitter handle", (done) => {
         const account = "sdsiopdfanusdfoiosd";
