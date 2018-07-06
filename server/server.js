@@ -109,10 +109,7 @@ app.use(bodyParser.json());
 
 
     app.delete("/users/me/trackers/court_cases/:case_id", authenticate, (req,res) => {
-
             const case_id = req.params.case_id;
-            console.log(`case_id: ${case_id}`);
-
             User.findOne({_id: req.user._id})
                 .then((user) => {
                     user.trackers.court_cases.id(case_id).remove();
@@ -141,6 +138,19 @@ app.use(bodyParser.json());
             });
     });
 
+    app.delete("/users/me/trackers/tweets/:tweet_id", authenticate, (req,res) => {
+            const tweet_id = req.params.tweet_id;
+            User.findOne({_id: req.user._id})
+                .then((user) => {
+                    user.trackers.tweets.id(tweet_id).remove();
+                    return user.save();
+                })
+                .then((user) => {
+                    res.status(200).send(user.trackers.tweets);
+                })
+                .catch((e) => res.status(400).send(e));
+
+    });
 
     app.post("/users/me/trackers/legislation", authenticate, legislationValidator, (req,res) => {
         let new_legislation = {
@@ -156,6 +166,21 @@ app.use(bodyParser.json());
             }).catch((e) => {
                 res.status(400).send(e);
             });
+    });
+
+
+    app.delete("/users/me/trackers/legislation/:legislation_id", authenticate, (req,res) => {
+            const legislation_id = req.params.legislation_id;
+            User.findOne({_id: req.user._id})
+                .then((user) => {
+                    user.trackers.legislation.id(legislation_id).remove();
+                    return user.save();
+                })
+                .then((user) => {
+                    res.status(200).send(user.trackers.legislation);
+                })
+                .catch((e) => res.status(400).send(e));
+
     });
 
 
