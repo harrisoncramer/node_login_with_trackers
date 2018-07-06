@@ -3,10 +3,9 @@ const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const { CourtCaseSchema, TwitterSchema, LegislationSchema, EmailSchema } = require("./trackerSchemas");
+const { ObjectID } = require("mongodb");
+const { CourtCaseSchema, TwitterSchema, LegislationSchema } = require("./trackerSchemas");
 const axios = require("axios");
-
-const ObjectId = mongoose.Types.ObjectId;
 
 const UserSchema = new mongoose.Schema({
     email: {
@@ -38,11 +37,19 @@ const UserSchema = new mongoose.Schema({
         }
     }],
     trackers: {
-        tweets: [TwitterSchema],
-        legislation: [LegislationSchema],
-        court_cases: [CourtCaseSchema]
-    },
-    frequency: [EmailSchema]
+        tweets: {
+            type: [TwitterSchema],
+            default: null
+        },
+        legislation: {
+            type: [LegislationSchema],
+            default: null
+        },
+        court_cases: {
+            type: [CourtCaseSchema],
+            default: null
+        }
+    }
 });
 
 UserSchema.methods.toJSON = function() {

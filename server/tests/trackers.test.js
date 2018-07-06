@@ -119,8 +119,7 @@ describe("POST /users/me/trackers/court_cases", () => {
     it("Should not post an invalid new court case", (done) => {
 
         const new_courtcase = {
-            "frequency": 30,
-            "case_name": "Case name"
+            "frequency": "ssfop"
         }
 
         supertest(app)

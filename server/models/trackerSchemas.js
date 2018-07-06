@@ -10,28 +10,23 @@ const CourtCaseSchema = new mongoose.Schema({
         case_name: String
 });
 
-
-const EmailSchema = new mongoose.Schema({
-        per_day: {
-            type: Number,
-        },
-        alert_time: {
-            type: String,
-        }
-});
-
 const TwitterSchema = new mongoose.Schema({
-        account: String
+        account: {
+            type: String,
+            required: true
+        }
 });
 
 
 const LegislationSchema = new mongoose.Schema({
-        legislation: String
+        legislation: {
+            type: String,
+            required: true
+        }
 });
 
 module.exports = {
     CourtCaseSchema,
-    EmailSchema,
     TwitterSchema,
-    LegislationSchema
+    LegislationSchema,
 }

@@ -3,7 +3,7 @@ const _ = require("lodash");
 const config = require("./config/config.js");
 const path = require("path");
 
-const {ObjectId} = require('mongodb'); // or ObjectID
+// const {ObjectID} = require('mongodb'); // or ObjectID
 
 const bodyParser = require("body-parser");
 const { mongoose } = require("./db/mongoose");
@@ -28,12 +28,7 @@ app.use(bodyParser.json());
 
     app.post("/users", (req,res) => {
         var body = _.pick(req.body, ['email', 'password']);
-        body.frequency = {
-            alert_time: new Date(),
-            email: req.body.email
-        }
         var user = new User(body);
-
         user.save().then(() => {
             return user.generateAuthToken();
         }).then((token) => {
@@ -116,7 +111,6 @@ app.use(bodyParser.json());
                     return user.save();
                 })
                 .then((user) => {
-                    console.log("SUCCESS");
                     res.status(200).send(user.trackers.court_cases);
                 })
                 .catch((e) => res.status(400).send(e));
