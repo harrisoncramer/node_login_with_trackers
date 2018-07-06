@@ -3,6 +3,8 @@ const _ = require("lodash");
 const config = require("./config/config.js");
 const path = require("path");
 
+const {ObjectId} = require('mongodb'); // or ObjectID
+
 const bodyParser = require("body-parser");
 const { mongoose } = require("./db/mongoose");
 const { User } = require("./models/user");
@@ -103,6 +105,25 @@ app.use(bodyParser.json());
             }).catch((e) => {
                 res.status(400).send(e);
             });
+    });
+
+
+    app.delete("/users/me/trackers/court_cases/:case_id", authenticate, (req,res) => {
+
+            const case_id = req.params.case_id;
+            console.log(`case_id: ${case_id}`);
+
+            User.findOne({_id: req.user._id})
+                .then((user) => {
+                    user.trackers.court_cases.id(case_id).remove();
+                    return user.save();
+                })
+                .then((user) => {
+                    console.log("SUCCESS");
+                    res.status(200).send(user.trackers.court_cases);
+                })
+                .catch((e) => res.status(400).send(e));
+
     });
 
     app.post("/users/me/trackers/tweets", authenticate, tweetValidator, (req,res) => {
