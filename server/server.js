@@ -84,22 +84,15 @@ app.use(bodyParser.json());
     });
 
     app.post("/users/me/trackers/court_cases", authenticate, caseValidator, (req,res) => {
-        let new_case = {
-            case_id: req.body.case_id, // E.g. hr1488
-            case_name: req.body.case_name, // Name of bill
-            frequency: req.body.frequency   // Frequency of update (30x per day)
-        };
-
-        User.findOne({_id: req.user._id})
-            .then((user) => {
-                user.trackers.court_cases.push(req.body);
-                return user.save();
-            })
-            .then((user) => {
-                res.status(200).send(user.trackers.court_cases);
-            }).catch((e) => {
-                res.status(400).send(e);
-            });
+        User.update(
+            { _id: req.user._id },
+            { $addToSet: { "trackers.court_cases" : req.body }},
+        function(err,result){
+            if(err){
+                res.status(400).send(err);
+            }
+            res.status(200).send();
+        });
     });
 
 

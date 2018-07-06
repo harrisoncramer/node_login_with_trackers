@@ -10,21 +10,39 @@ const { users, populateUsers } = require("./seed/seed");
 // Reset database for tests
 beforeEach(populateUsers);
 
-describe("POST /users/me/trackers/tweets", () => {
-    it("Should post a new twitter handle", (done) => {
+describe("/users/me/trackers/tweets", () => {
+
+    const fakeId = new ObjectID()
+    before((done) => {
+        User.findById(users[0]._id)
+            .then((user) => {
+            user.trackers.tweets.push({account: "Sisd9fjans", _id: fakeId});
+            return user.save()
+            })
+            .then(() => {
+                done();
+            });
+    });
+
+    it("Should POST a new twitter handle", (done) => {
         const account = "harrisoncramer";
         supertest(app)
             .post("/users/me/trackers/tweets")
             .set("x-auth", users[0].tokens[0].token) // Pass in token.
             .send({account: account})
             .expect(200)
-            .expect((res) => {
-               expect(res.body[0].account === account);
+            .end((err,res) => {
+               if(err){
+                    done(err);
+                }
+                User.findById(users[0]._id).then((user) => {
+                    expect(user.trackers.tweets.length === 1);
+                    expect(user.trackers.tweets === account);
+                    done();
+                })
             })
-            .end(done)
     });
-
-    it("Should not post an invalid twitter handle", (done) => {
+    it("Should not POST an invalid twitter handle", (done) => {
         const account = "sdsiopdfanusdfoiosd";
         supertest(app)
             .post("/users/me/trackers/tweets")
@@ -41,11 +59,34 @@ describe("POST /users/me/trackers/tweets", () => {
                 })
             })
     });
+    it("Should DELETE a twitter account", (done) => {
+        supertest(app)
+            .delete(`/users/me/trackers/tweets/${fakeId}`)
+            .set("x-auth", users[0].tokens[0].token) // Pass in token.
+            .expect(200)
+            .end((err,res) => {
+                User.findById(users[0]._id).then((user) => {
+                    expect(user.trackers.tweets.length === 0);
+                    done();
+                });
+            });
+    });
 });
 
+describe("/users/me/trackers/legislation", () => {
+    const fakeId = new ObjectID()
+    before((done) => {
+        User.findById(users[0]._id)
+            .then((user) => {
+            user.trackers.legislation.push({legislation: "h2", _id: fakeId});
+            return user.save()
+            })
+            .then(() => {
+                done();
+            })
 
-describe("POST /users/me/trackers/legislation", () => {
-    it("Should post a new legislation", (done) => {
+    })
+    it("Should POST a new legislation", (done) => {
         const legislation = "hr1260";
         supertest(app)
             .post("/users/me/trackers/legislation")
@@ -66,7 +107,7 @@ describe("POST /users/me/trackers/legislation", () => {
                 })
             })
     });
-    it("Should not post invalid legislation", (done) => {
+    it("Should not POST invalid legislation", (done) => {
         const legislation = {};
         supertest(app)
             .post("/users/me/trackers/legislation")
@@ -83,18 +124,28 @@ describe("POST /users/me/trackers/legislation", () => {
                 });
             })
     });
+    it("Should DELETE legislation", (done) => {
+        supertest(app)
+            .delete(`/users/me/trackers/legislation/${fakeId}`)
+            .set("x-auth", users[0].tokens[0].token) // Pass in token.
+            .expect(200)
+            .end((err,res) => {
+                User.findById(users[0]._id).then((user) => {
+                    expect(user.trackers.legislation.length === 0);
+                    done();
+                });
+            });
+    });
 });
 
 
-describe("POST /users/me/trackers/court_cases", () => {
-    it("Should post a new court case", (done) => {
-
+describe("/users/me/trackers/court_cases", () => {
+    it("Should POST a new court case", (done) => {
         const new_courtcase = {
             "case_id": 333166,
             "frequency": 30,
             "case_name": "Case name"
         }
-
         supertest(app)
             .post("/users/me/trackers/court_cases")
             .set("x-auth", users[0].tokens[0].token) // Pass in token.
@@ -112,16 +163,13 @@ describe("POST /users/me/trackers/court_cases", () => {
                     expect(user.trackers.court_cases === new_courtcase)
 
                     done();
-                })
-            })
+                });
+            });
     });
-
-    it("Should not post an invalid new court case", (done) => {
-
+    it("Should not POST an invalid new court case", (done) => {
         const new_courtcase = {
             "frequency": "ssfop"
         }
-
         supertest(app)
             .post("/users/me/trackers/court_cases")
             .set("x-auth", users[0].tokens[0].token) // Pass in token.
@@ -134,7 +182,7 @@ describe("POST /users/me/trackers/court_cases", () => {
                 User.findById(users[0]._id).then((user) => {
                     expect(user.trackers.court_cases.length === 0);
                     done();
-                })
-            })
+                });
+            });
     });
 });
