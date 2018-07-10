@@ -13,4 +13,4 @@ app.listen(port, () => {
     console.log(`___${process.env.NODE_ENV || "development"} server____ started on port ${port}.\n`);
 });
 
-module.exports = { app };
+module.exports = { app }; // For testing purposes (our final app)
