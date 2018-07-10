@@ -16,9 +16,6 @@ describe("GET /", () => {
             .get("/")
             .set("x-auth", users[0].tokens[0].token)
             .expect(200)
-            .expect((res) => {
-                expect(res.text === "<p>CUSTOM USER HERE</p>");
-            })
             .end(done);
     });
     it("Should redirect to login page", (done) => {
@@ -134,7 +131,7 @@ describe("POST /users/login", () => { // This will return a token to the user.
     });
 });
 
-describe("DELETE /users/me/token", () => {
+describe("DELETE /users/me/", () => {
     it("Should logout a user by deleting the jwt token", (done) => {
         supertest(app)
             .delete("/users/me/")
@@ -143,6 +140,7 @@ describe("DELETE /users/me/token", () => {
             .end((err,res) => {
                 if(err){
                     done(err);
+                    console.log(err);
                 }
                 User.findById(users[0]._id).then((user) => {
                     expect(user.tokens.length).toBe(0);
