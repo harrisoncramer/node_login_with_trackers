@@ -17,7 +17,6 @@ const TwitterSchema = new mongoose.Schema({
         }
 });
 
-
 const LegislationSchema = new mongoose.Schema({
         legislation: {
             type: String,
