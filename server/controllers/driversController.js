@@ -59,7 +59,8 @@ const trackers = (req,res) => {
 const court_cases = (req,res) => {
   User.findOne({_id: req.user._id})
     .then((user) => {
-      user.trackers.court_cases.push(req.body)
+      user.trackers.court_cases.push(req.pacer_data);
+      console.log(req.pacer_url);
       return user.save();
     })
     .then((user) => {

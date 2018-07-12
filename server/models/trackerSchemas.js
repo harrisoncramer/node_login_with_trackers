@@ -2,13 +2,27 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
 const CourtCaseSchema = new mongoose.Schema({
-        case_id: {
-            type: Number,
-            required: true
-        },
-        frequency: Number,
-        case_name: String
-});
+  resource_uri: String,
+  id: Number,
+  court: String,
+  clusters: Array,
+  absolute_url: String,
+  source: Number,
+  appeal_from_str: String,
+  assigned_to_str: String,
+  referred_to_str: String,
+  panel_str: String,
+  date_created: String, // Date?
+  date_modified: String,
+  case_name_short: String,
+  case_name: String,
+  case_name_full: '',
+  slug: String,
+  docket_number: String,
+  pacer_case_id: String,
+  mdl_status: String
+ }
+);
 
 const TwitterSchema = new mongoose.Schema({
         account: {

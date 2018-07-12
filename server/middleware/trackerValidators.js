@@ -1,6 +1,7 @@
 var { User } = require("../models/user");
 const path = require("path");
 const axios = require("axios");
+const config = require("../config/config.js");
 
 tweetValidator = function(req, res, next){
    var new_handle = req.body.account;
@@ -37,7 +38,7 @@ caseValidator = function(req, res, next){
         method: 'GET',
         url: `https://www.courtlistener.com/api/rest/v3/dockets/${case_id}/`,
         headers: {
-            'Authorization' : "Token abf3cc1e66120d01a889e95b82233ade82283db7"
+            'Authorization' : process.env.RECAP_KEY
         },
         json: true
     };
@@ -45,14 +46,16 @@ caseValidator = function(req, res, next){
     var url = `https://www.courtlistener.com/api/rest/v3/dockets/${case_id}/`
     axios(authOptions)
         .then((response) => {
-            console.log("success!")
+            req.pacer_data = response.data;
+            req.pacer_url = `https://www.courtlistener.com${response.data.absolute_url}`;
             next();
 
             //// Pass in the JSON data to the next middleware?
         })
         .catch((error) => {
             res.status(400)
-               .send(error)
+               .send(error);
+               next();
         });
 };
 
