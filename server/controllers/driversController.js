@@ -28,7 +28,7 @@ const login = (req,res) => {
         user.generateAuthToken().then((token) => {
             res.header('x-auth', token)
             .status(200)
-            .sendFile("index.html", {root: path.join(__dirname + '../../../public')});
+            .sendFile("index.html", {root: path.join(__dirname + '../../public')});
         })
     }).catch((e) => {
         res.status(400).send();
@@ -44,7 +44,7 @@ const logout = (req, res) => {
   req.user.removeToken(req.token)
     .then(() => {
       res.status(200)
-      .sendFile("login.html", {root: path.join(__dirname + '../../../public')});
+      .sendFile("login.html", {root: path.join(__dirname + '../../public')});
     })
     .catch((e) => {
         res.status(400).send();

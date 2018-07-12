@@ -168,6 +168,7 @@ describe("/users/me/trackers/court_cases", () => {
     });
     it("Should not POST an invalid new court case", (done) => {
         const new_courtcase = {
+            "case_id": 0,
             "frequency": "ssfop"
         }
         supertest(app)
