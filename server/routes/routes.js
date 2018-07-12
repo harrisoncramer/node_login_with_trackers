@@ -7,7 +7,7 @@ const DriversController = require("../controllers/driversController");
 
 // Routes (exported to server)
 module.exports = (app) => {
-  app.get("/", authenticate, DriversController.home);
+  app.get("/home", DriversController.home);
   app.get("/users/me/", authenticate, DriversController.showme);
   app.get("/users/me/trackers", authenticate, DriversController.trackers);
   app.post("/users", DriversController.users);

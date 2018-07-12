@@ -4,13 +4,10 @@ const path = require("path");
 const _ = require("lodash");
 
 const home = (req,res) => {
-  User.findOne({_id: req.user._id})
-  .then((user) => {
-      res.status(200).send("You're logged in!")
-  })
-  .catch((e) => {
-      res.status(400).send(e);
-  })};
+  res.status(200)
+    .send();
+};
+
 const users = (req,res) => {
     var body = _.pick(req.body, ['email', 'password']);
     var user = new User(body);
@@ -24,11 +21,13 @@ const users = (req,res) => {
     });};
 const login = (req,res) => {
     var { email, password } = _.pick(req.body, ['email', 'password']);
-    User.findByCredentials(email,password).then((user) => {
-        user.generateAuthToken().then((token) => {
+    User.findByCredentials(email,password)
+      .then((user) => {
+        user.generateAuthToken()
+          .then((token) => {
             res.header('x-auth', token)
             .status(200)
-            .sendFile("index.html", {root: path.join(__dirname + '../../public')});
+            .send(user.trackers);
         })
     }).catch((e) => {
         res.status(400).send();
@@ -60,7 +59,6 @@ const court_cases = (req,res) => {
   User.findOne({_id: req.user._id})
     .then((user) => {
       user.trackers.court_cases.push(req.pacer_data);
-      console.log(req.pacer_url);
       return user.save();
     })
     .then((user) => {
@@ -146,6 +144,9 @@ const delete_trackers = (req,res) => {
       });};
 
 module.exports = {
+/*  get_users,
+*/
+
   home,
   users,
   login,
