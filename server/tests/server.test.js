@@ -13,17 +13,17 @@ beforeEach(populateUsers);
 describe("GET /", () => {
     it("Should return logged in page if user is authenticated", (done) => {
         supertest(app)
-            .get("/")
+            .get("/home")
             .set("x-auth", users[0].tokens[0].token)
             .expect(200)
             .end(done);
     });
     it("Should redirect to login page", (done) => {
         supertest(app)
-            .get("/")
+            .get("/home")
             .expect(401)
             .expect((res) => {
-                expect(res.text === "<p>THIS IS THE LOGIN PAGE<p>");
+                expect(res.headers).toNotIncludeKey('x-auth')
             })
             .end(done);
     });

@@ -1,15 +1,8 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import { apiPOST, apiGET, apiDELETE } from './apiCalls'
 
-const callApi = async(url, params) => {
-  return axios.post(url,params)
-  .then((response) => {
-    return Promise.resolve(response);
-  })
-  .catch((err) => {
-    return Promise.reject(err);
-  });
-};
+import { HomePage } from "./HomePage.js";
+// import displayUser function.
 
 export class Login extends Component {
   constructor(props) {
@@ -17,17 +10,19 @@ export class Login extends Component {
     this.logUserIn = this.logUserIn.bind(this);
   }
   state = {
-    email: "test",
-    password: "tester"
+    email: "email",
+    password: "password"
   };
 
   logUserIn(e){
     e.preventDefault();
     var login = { email: document.getElementById("email").value, password: document.getElementById("password").value };
-    callApi("/users/login",login)
-      .then((res) => {
-        console.log(res.data)
-        // Update the application here!
+    apiPOST("/users/login",login)
+      .then((express) => {
+       const { data } = express
+       console.log(data);
+        /// Display ///
+       HomePage(data);
       })
       .catch(err => {
         alert(err);
@@ -51,7 +46,6 @@ export class ForgotPassword extends Component {
   render(){
     return (
       <div>
-        <h2>Login</h2>
         <button>Forgot password?</button>
       </div>
     )
