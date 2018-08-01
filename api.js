@@ -1,16 +1,16 @@
-const express = require('express');
-const fs = require('fs');
+const express = require("express");
+const config = require("./config/config.js");
+const bodyParser = require("body-parser");
+const routes = require("./routes/routes");
 
 const app = express();
-app.use(express.json());
+app.use(bodyParser.json());
 
-app.get('/api', (req, res) => {
-  res.sendFile(__dirname + '/stuff.json');
+routes(app); // Pass in app to routes function.
+
+const port = process.env.PORT;
+app.listen(port, () => {
+    console.log(`___Backend ${process.env.NODE_ENV || "development"} server____ started on port ${port}.\n`);
 });
 
-app.post('/api', (req, res) => {
-  fs.writeFileSync(__dirname + '/stuff.json', JSON.stringify(req.body, null, 2));
-  res.send('things have been updated');
-});
-
-app.listen(4000, () => console.log('Example app listening on port 4000!'));
+module.exports = { app }; // For testing purposes (our final app)
